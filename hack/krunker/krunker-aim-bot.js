@@ -22,6 +22,7 @@ const x = {
   ReflectApply: Reflect.apply,
   ArrayPrototype: Array.prototype,
 };
+
 const proxied = new Proxy(Array.prototype.push, {
   apply(target, thisArgs, [object]) {
     try {
@@ -37,6 +38,7 @@ const proxied = new Proxy(Array.prototype.push, {
     return x.ReflectApply(...arguments);
   },
 });
+
 const interval = setInterval(function () {
   const el = x.querySelector.call(x.document, "#initLoader");
   if (el && el.style.display === "none") {
@@ -45,6 +47,7 @@ const interval = setInterval(function () {
     clearInterval(interval);
   }
 }, 1);
+
 let espEnabled = true;
 let aimbotEnabled = true;
 let aimbotOnRightMouse = false;
@@ -52,6 +55,7 @@ let espLinesEnabled = true;
 const tempVector = new THREE.Vector3();
 const tempObject = new THREE.Object3D();
 tempObject.rotation.order = "YXZ";
+
 const geometry = new THREE.EdgesGeometry(
   new THREE.BoxGeometry(5, 15, 5).translate(0, 7.5, 0)
 );
@@ -71,6 +75,7 @@ const material = new THREE.RawShaderMaterial({
 	}
 	`,
 });
+
 const line = new THREE.LineSegments(new THREE.BufferGeometry(), material);
 line.frustumCulled = false;
 const linePositions = new THREE.BufferAttribute(
@@ -78,19 +83,15 @@ const linePositions = new THREE.BufferAttribute(
   3
 );
 line.geometry.setAttribute("position", linePositions);
+
 function animate() {
   window.requestAnimationFrame(animate);
-  if (
-    typeof shouldShowAd === "undefined" ||
-    shouldShowAd === true ||
-    scene === undefined
-  ) {
+  if (scene === undefined) {
     return;
   }
   const players = [];
   let myPlayer;
-  for (let i = 0; i < scene.children.length; i++) {
-    const child = scene.children[i];
+  for (const child of scene.children) {
     if (child.type === "Object3D") {
       try {
         if (child.children[0].children[0].type === "PerspectiveCamera") {
@@ -106,8 +107,8 @@ function animate() {
   let minDistance = Infinity;
   let minAngle = Infinity;
   tempObject.matrix.copy(myPlayer.matrix).invert();
-  for (let i = 0; i < players.length; i++) {
-    const player = players[i];
+
+  for (const player of players) {
     if (!player.box) {
       const box = new THREE.LineSegments(geometry, material);
       box.frustumCulled = false;
@@ -131,7 +132,15 @@ function animate() {
     linePositions.setXYZ(counter++, tempVector.x, tempVector.y, tempVector.z);
     player.visible = espEnabled || player.visible;
     player.box.visible = espEnabled;
-    const distance = player.position.distanceTo(myPlayer.position);
+    // closed target interms of distance
+
+    // const distance = player.position.distanceTo(myPlayer.position);
+    // if (distance < minDistance) {
+    //   targetPlayer = player;
+    //   minDistance = distance;
+    // }
+
+    // closed target interms of angle
     const direction = player.position
       .clone()
       .sub(myPlayer.position)
@@ -139,12 +148,6 @@ function animate() {
     const angle = myPlayer.children[0]
       .getWorldDirection(tempVector)
       .angleTo(direction);
-    // closed target interms of distance
-    // if (distance < minDistance) {
-    //   targetPlayer = player;
-    //   minDistance = distance;
-    // }
-    // closed target interms of angle
     if (angle < minAngle) {
       targetPlayer = player;
       minAngle = angle;
@@ -164,15 +167,17 @@ function animate() {
   targetPlayer.children[0].children[0].localToWorld(tempVector);
   tempObject.position.copy(myPlayer.position);
   tempObject.lookAt(tempVector);
+
   myPlayer.children[0].rotation.x = -tempObject.rotation.x;
   myPlayer.rotation.y = tempObject.rotation.y + Math.PI;
 }
+
 const value = parseInt(
   new URLSearchParams(window.location.search).get("showAd"),
   16
 );
-const shouldShowAd = false;
-//   isNaN(value) || Date.now() - value < 0 || Date.now() - value > 10 * 60 * 1000;
+const shouldShowAd = false; // isNaN(value) || Date.now() - value < 0 || Date.now() - value > 10 * 60 * 1000;
+
 const el = document.createElement("div");
 el.innerHTML = `<style>
 .dialog {
@@ -246,36 +251,33 @@ el.innerHTML = `<style>
 }
 </style>
 <div class="msg" style="display: none;"></div>
-<div class="dialog">${
-  shouldShowAd
-    ? `<big>Loading ad...</big>`
-    : `<div class="close" onclick="this.parentNode.style.display='none';"></div>
-	<big>== Aimbot & ESP ==</big>
-	<br>
-	<br>
-	[B] to toggle aimbot
-	<br>
-	[V] to toggle ESP
-	<br>
-	[N] to toggle ESP Lines
-	<br>
-	[L] to toggle aimbot on <br>right mouse hold
-	<br>
-	[H] to show/hide help
-	<br>
-	<br>
-	By Zertalious
-	<br>
-	<br>
-	<div style="display: grid; grid-template-columns: 1fr 1fr; grid-gap: 5px;">
-		<div class="btn" onclick="window.open('https://discord.gg/K24Zxy88VM', '_blank')">Discord</div>
-		<div class="btn" onclick="window.open('https://www.instagram.com/zertalious/', '_blank')">Instagram</div>
-		<div class="btn" onclick="window.open('https://twitter.com/Zertalious', '_blank')">Twitter</div>
-		<div class="btn" onclick="window.open('https://greasyfork.org/en/users/662330-zertalious', '_blank')">More scripts</div>
-	</div>
-	`
-}
+<div class="dialog">
+  <div class="close" onclick="this.parentNode.style.display='none';"></div>
+  <big>== Aimbot & ESP ==</big>
+  <br>
+  <br>
+  [B] to toggle aimbot
+  <br>
+  [V] to toggle ESP
+  <br>
+  [N] to toggle ESP Lines
+  <br>
+  [L] to toggle aimbot on <br>right mouse hold
+  <br>
+  [H] to show/hide help
+  <br>
+  <br>
+  By Zertalious
+  <br>
+  <br>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; grid-gap: 5px;">
+    <div class="btn" onclick="window.open('https://discord.gg/K24Zxy88VM', '_blank')">Discord</div>
+    <div class="btn" onclick="window.open('https://www.instagram.com/zertalious/', '_blank')">Instagram</div>
+    <div class="btn" onclick="window.open('https://twitter.com/Zertalious', '_blank')">Twitter</div>
+    <div class="btn" onclick="window.open('https://greasyfork.org/en/users/662330-zertalious', '_blank')">More scripts</div>
+  </div>
 </div>`;
+
 const msgEl = el.querySelector(".msg");
 const dialogEl = el.querySelector(".dialog");
 window.addEventListener("DOMContentLoaded", function () {
@@ -283,20 +285,14 @@ window.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(el.children[0]);
   }
 });
-if (shouldShowAd) {
-  const url = new URL(window.location.href);
-  url.searchParams.set("showAd", Date.now().toString(16));
-  url.searchParams.set("scriptVersion", GM.info.script.version);
-  window.location.href =
-    "https://zertalious.xyz?ref=" +
-    new TextEncoder().encode(url.href).toString();
-}
+
 let rightMouseDown = false;
 function handleMouse(event) {
   if (event.button === 2) {
     rightMouseDown = event.type === "pointerdown" ? true : false;
   }
 }
+
 window.addEventListener("pointerdown", handleMouse);
 window.addEventListener("pointerup", handleMouse);
 window.addEventListener("keyup", function (event) {
@@ -322,10 +318,10 @@ window.addEventListener("keyup", function (event) {
       break;
   }
 });
+
 function showMsg(name, bool) {
   msgEl.innerText = name + ": " + (bool ? "ON" : "OFF");
   msgEl.style.display = "none";
-  void msgEl.offsetWidth;
   msgEl.style.display = "";
 }
 animate();
