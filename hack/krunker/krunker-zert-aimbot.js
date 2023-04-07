@@ -50,8 +50,9 @@ const interval = setInterval(function () {
 
 let espEnabled = true;
 let aimbotEnabled = true;
-let aimbotOnRightMouse = false;
+let aimbotOnRightMouse = true;
 let espLinesEnabled = true;
+
 const tempVector = new THREE.Vector3();
 const tempObject = new THREE.Object3D();
 tempObject.rotation.order = "YXZ";
@@ -104,7 +105,6 @@ function animate() {
   }
   let counter = 0;
   let targetPlayer;
-  let minDistance = Infinity;
   let minAngle = Infinity;
   tempObject.matrix.copy(myPlayer.matrix).invert();
 
@@ -140,14 +140,12 @@ function animate() {
     //   minDistance = distance;
     // }
 
-    // closed target interms of angle
-    const direction = player.position
-      .clone()
-      .sub(myPlayer.position)
-      .normalize();
-    const angle = myPlayer.children[0]
-      .getWorldDirection(tempVector)
-      .angleTo(direction);
+    // closed target interms of angle 3d
+    let lookDirection = new THREE.Vector3();
+    myPlayer.children[0].children[0].getWorldDirection(lookDirection);
+    const angle = lookDirection.angleTo(
+      player.position.clone().sub(myPlayer.position)
+    );
     if (angle < minAngle) {
       targetPlayer = player;
       minAngle = angle;
@@ -172,12 +170,6 @@ function animate() {
   myPlayer.rotation.y = tempObject.rotation.y + Math.PI;
 }
 
-const value = parseInt(
-  new URLSearchParams(window.location.search).get("showAd"),
-  16
-);
-const shouldShowAd = false; // isNaN(value) || Date.now() - value < 0 || Date.now() - value > 10 * 60 * 1000;
-
 const el = document.createElement("div");
 el.innerHTML = `<style>
 .dialog {
@@ -191,6 +183,7 @@ el.innerHTML = `<style>
 	transform: translate(-50%, -50%);
 	text-align: center;
 	z-index: 999999;
+  display: none;
 }
 .dialog * {
 	color: #fff;
