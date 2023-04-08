@@ -52,6 +52,7 @@ let espEnabled = true;
 let aimbotEnabled = true;
 let aimbotOnRightMouse = true;
 let espLinesEnabled = true;
+let aimClosetPlayerInDistant = false;
 
 const tempVector = new THREE.Vector3();
 const tempObject = new THREE.Object3D();
@@ -106,6 +107,7 @@ function animate() {
   let counter = 0;
   let targetPlayer;
   let minAngle = Infinity;
+  let minDistance = Infinity;
   tempObject.matrix.copy(myPlayer.matrix).invert();
 
   for (const player of players) {
@@ -132,23 +134,25 @@ function animate() {
     linePositions.setXYZ(counter++, tempVector.x, tempVector.y, tempVector.z);
     player.visible = espEnabled || player.visible;
     player.box.visible = espEnabled;
-    // closed target interms of distance
 
-    // const distance = player.position.distanceTo(myPlayer.position);
-    // if (distance < minDistance) {
-    //   targetPlayer = player;
-    //   minDistance = distance;
-    // }
-
-    // closed target interms of angle 3d
-    let lookDirection = new THREE.Vector3();
-    myPlayer.children[0].children[0].getWorldDirection(lookDirection);
-    const angle = lookDirection.angleTo(
-      player.position.clone().sub(myPlayer.position)
-    );
-    if (angle < minAngle) {
-      targetPlayer = player;
-      minAngle = angle;
+    if (aimClosetPlayerInDistant) {
+      // closed target interms of distance
+      const distance = player.position.distanceTo(myPlayer.position);
+      if (distance < minDistance) {
+        targetPlayer = player;
+        minDistance = distance;
+      }
+    } else {
+      // closed target interms of angle 3d
+      let lookDirection = new THREE.Vector3();
+      myPlayer.children[0].children[0].getWorldDirection(lookDirection);
+      const angle = lookDirection.angleTo(
+        player.position.clone().sub(myPlayer.position)
+      );
+      if (angle < minAngle) {
+        targetPlayer = player;
+        minAngle = angle;
+      }
     }
   }
   linePositions.needsUpdate = true;
@@ -163,6 +167,7 @@ function animate() {
   }
   tempVector.setScalar(0);
   targetPlayer.children[0].children[0].localToWorld(tempVector);
+  tempVector.y += 3;
   tempObject.position.copy(myPlayer.position);
   tempObject.lookAt(tempVector);
 
@@ -288,8 +293,18 @@ function handleMouse(event) {
 
 window.addEventListener("pointerdown", handleMouse);
 window.addEventListener("pointerup", handleMouse);
+window.addEventListener("keydown", function (event) {
+  // shift
+  if (event.code == "ShiftLeft" || event.code == "ShiftRight") {
+    aimClosetPlayerInDistant = true;
+  }
+});
 window.addEventListener("keyup", function (event) {
   switch (event.code) {
+    case "ShiftLeft":
+    case "ShiftRight":
+      aimClosetPlayerInDistant = false;
+      break;
     case "KeyV":
       espEnabled = !espEnabled;
       showMsg("ESP", espEnabled);
