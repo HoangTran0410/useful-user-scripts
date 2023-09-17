@@ -10,3 +10,5 @@
 [Greasyfork Search with Sleazyfork Results include](https://greasyfork.org/en/scripts/23840-greasyfork-search-with-sleazyfork-results-include)
 
 [Local YouTube Downloader](https://greasyfork.org/en/scripts/369400-local-youtube-downloader)
+
+[Fireship.io PRO](https://greasyfork.org/en/scripts/455330-freeship)
