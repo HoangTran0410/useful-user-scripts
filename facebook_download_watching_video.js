@@ -3,6 +3,7 @@
 // @icon        https://www.facebook.com/favicon.ico
 // @namespace   Violentmonkey Scripts
 // @match       https://www.facebook.com/*
+// @match       https://web.facebook.com/*
 // @grant       GM_registerMenuCommand
 // @version     1.0
 // @author      -
